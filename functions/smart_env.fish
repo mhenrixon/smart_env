@@ -3,7 +3,7 @@ function smart_env --description "Smart environment loader with change detection
     set -l storage_dir ~/.config/smart_env
     mkdir -p $storage_dir/cache
     mkdir -p $storage_dir/variables
-
+    
     # Process each env file
     for env_file in $argv
         if test -f $env_file
@@ -103,15 +103,31 @@ function smart_env --description "Smart environment loader with change detection
                 end
                 
                 # Clear tracked variables for this file
-                echo -n "" > $vars_file
+                echo -n "" >$vars_file
                 
                 # Load and track the new variables
                 for line in (cat $abs_path | grep -v '^#' | grep -v '^\s*$')
                     set item (string split -m 1 '=' $line)
                     if test (count $item) -eq 2
-                        set -gx $item[1] $item[2]
+                        set var_name $item[1]
+                        set var_value $item[2]
+                        
+                        # Handle PATH specially to avoid breaking shell functionality
+                        if test "$var_name" = PATH
+                            # Extract first part before semicolon if present
+                            set path_part (string split ":" $var_value)[1]
+                            if test -n "$path_part"
+                                # Add to path instead of replacing it
+                                fish_add_path $path_part
+                                echo "Added $path_part to PATH"
+                            end
+                        else
+                            # Set regular environment variables
+                            set -gx $var_name $var_value
+                        end
+                        
                         # Track this variable
-                        echo $item[1] >> $vars_file
+                        echo $var_name >> $vars_file
                     end
                 end
                 set_color green

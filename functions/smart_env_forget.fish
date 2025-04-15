@@ -18,7 +18,10 @@ function smart_env_forget --description "Forget an approved environment file"
         # Unset any environment variables from this file
         if test -f $vars_file
             for var_name in (cat $vars_file)
-                set -e $var_name
+                # Skip PATH as we're using fish_add_path instead
+                if test "$var_name" != PATH
+                    set -e $var_name
+                end
             end
             rm $vars_file
         end

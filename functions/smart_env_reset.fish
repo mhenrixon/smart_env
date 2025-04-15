@@ -8,12 +8,15 @@ function smart_env_reset --description "Reset all environment file approvals"
     
     read -l -P "Are you sure you want to forget all approved environment files? (y/n) " confirm
     
-    if test "$confirm" = "y" -o "$confirm" = "yes" -o "$confirm" = "Y"
+    if test "$confirm" = y -o "$confirm" = yes -o "$confirm" = Y
         # First unset all environment variables
         for vars_file in $storage_dir/variables/*.vars
             if test -f $vars_file
                 for var_name in (cat $vars_file)
-                    set -e $var_name
+                    # Skip PATH as we're using fish_add_path instead
+                    if test "$var_name" != PATH
+                        set -e $var_name
+                    end
                 end
             end
         end

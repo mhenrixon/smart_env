@@ -17,7 +17,10 @@ function smart_env_unset --description "Unset environment variables for the curr
                     set_color normal
                     
                     for var_name in (cat $vars_file)
-                        set -e $var_name
+                        # Skip PATH as we're using fish_add_path instead
+                        if test "$var_name" != PATH
+                            set -e $var_name
+                        end
                     end
                 end
             end
