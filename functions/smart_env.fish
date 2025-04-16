@@ -117,9 +117,9 @@ function smart_env --description "Smart environment loader with change detection
                             # Extract first part before semicolon if present
                             set path_part (string split ":" $var_value)[1]
                             if test -n "$path_part"
-                                # Add to path instead of replacing it
-                                fish_add_path $path_part
-                                echo "Added $path_part to PATH"
+                                # Prepend to path instead of appending it
+                                fish_add_path -p $path_part
+                                echo "Prepended $path_part to PATH"
                             end
                         else
                             # Set regular environment variables
