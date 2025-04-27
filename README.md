@@ -22,8 +22,11 @@ $ omf install smart_env
 - **Automatic Directory Handling:** Variables are automatically unset when leaving a directory
 - **Change Detection:** Notifies when env file contents change
 - **Visual Diff Support:** See what changed in your environment files
-- **Security Focused:** Requires approval for loading env files
+- **Security Focused:** Requires approval for loading env files and preserves sensitive information
 - **Automatic Mode:** Can automatically load common .env files in directories
+- **Safe PATH Handling:** Safely manages PATH variables using fish_add_path
+- **Privacy Focused:** Does not display sensitive environment variable values
+- **macOS Optimized:** Fully compatible with macOS
 
 ## Usage
 
