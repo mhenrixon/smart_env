@@ -22,6 +22,7 @@ function smart_env --description "Simple environment loader with change detectio
             set -l hash_file $storage_dir/(echo $abs_path | string replace -a / _ | string replace -a : _).hash
             set -l cache_file $storage_dir/cache/(echo $abs_path | string replace -a / _ | string replace -a : _).env
             set -l vars_file $storage_dir/variables/(echo $abs_path | string replace -a / _ | string replace -a : _).vars
+            set -l paths_file $storage_dir/variables/(echo $abs_path | string replace -a / _ | string replace -a : _).paths
             set -l dir_track_file $storage_dir/variables/(echo $abs_path | string replace -a / _ | string replace -a : _).dir
 
             set -l load_file 0
@@ -100,8 +101,9 @@ function smart_env --description "Simple environment loader with change detectio
 
             # Load the env file if approved
             if test $load_file -eq 1
-                # Clear tracked variables for this file
+                # Clear tracked variables and paths for this file
                 echo -n "" >$vars_file
+                echo -n "" >$paths_file
 
                 # Store the current directory with this env file
                 echo $PWD > $dir_track_file
@@ -122,9 +124,21 @@ function smart_env --description "Simple environment loader with change detectio
                             # Handle path components
                             for path_part in (string split ":" $var_value)
                                 if test -n "$path_part"
+                                    # Resolve relative paths to absolute paths
+                                    set -l abs_path_part
+                                    if string match -q "./*" $path_part
+                                        # Relative path starting with ./
+                                        set abs_path_part $PWD/(string replace "./" "" $path_part)
+                                    else if string match -q "/*" $path_part
+                                        # Already absolute
+                                        set abs_path_part $path_part
+                                    else
+                                        # Relative path without ./
+                                        set abs_path_part $PWD/$path_part
+                                    end
                                     # Use fish_add_path to safely modify PATH
-                                    fish_add_path -p $path_part
-                                    set -a added_paths $path_part
+                                    fish_add_path -p $abs_path_part
+                                    set -a added_paths $abs_path_part
                                 end
                             end
                         else
@@ -138,20 +152,27 @@ function smart_env --description "Simple environment loader with change detectio
                     end
                 end
 
+                # Save tracked paths to file for later removal
+                if test (count $added_paths) -gt 0
+                    for p in $added_paths
+                        echo $p >> $paths_file
+                    end
+                end
+
                 # Show summary of what was loaded
                 set_color green
                 echo "✅ Loaded environment from $env_file"
-                
+
                 if test (count $set_variables) -gt 0
                     set_color cyan
                     echo "  Variables set: $set_variables"
                 end
-                
+
                 if test (count $added_paths) -gt 0
                     set_color cyan
                     echo "  Paths added: $added_paths"
                 end
-                
+
                 set_color normal
             end
         else
