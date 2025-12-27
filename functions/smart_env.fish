@@ -112,12 +112,29 @@ function smart_env --description "Simple environment loader with change detectio
                 set -l set_variables
                 set -l added_paths
 
+                # Variables that should NEVER be set from .env files
+                # These are managed by chruby, mise, or the system
+                set -l protected_vars \
+                    RUBY_VERSION RUBY_ENGINE RUBY_ROOT RUBYOPT RUBYLIB \
+                    GEM_HOME GEM_PATH GEM_ROOT \
+                    CHRUBY_VERSION CHRUBY_ROOT RUBY_AUTO_VERSION \
+                    RBENV_VERSION RBENV_ROOT \
+                    SHELL USER HOME TERM
+
                 # Load and track the new variables
                 for line in (cat $abs_path | grep -v '^#' | grep -v '^\s*$')
                     set item (string split -m 1 '=' $line)
                     if test (count $item) -eq 2
                         set var_name $item[1]
                         set var_value $item[2]
+
+                        # Skip protected variables
+                        if contains -- $var_name $protected_vars
+                            set_color yellow
+                            echo "  ⚠️  Skipping protected variable: $var_name (managed by system/chruby)"
+                            set_color normal
+                            continue
+                        end
 
                         # Handle PATH specially
                         if test "$var_name" = PATH
