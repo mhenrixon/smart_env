@@ -17,8 +17,8 @@ function setup_test_env
     mkdir -p "$__test_tmpdir/project2/bin"
 
     # Create .ruby-version files (use installed Ruby version)
-    echo "3.4.7" > "$__test_tmpdir/project1/.ruby-version"
-    echo "3.4.7" > "$__test_tmpdir/project2/.ruby-version"
+    echo "3.4.7" >"$__test_tmpdir/project1/.ruby-version"
+    echo "3.4.7" >"$__test_tmpdir/project2/.ruby-version"
 
     # Note: We don't create .env files here to avoid interactive prompts during tests
 end

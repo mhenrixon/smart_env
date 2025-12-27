@@ -3,23 +3,23 @@ function __smart_env_directory_watcher --on-variable PWD --description "Auto-loa
     if set -q __smart_env_in_progress
         return 0
     end
-    
+
     # Set the recursion guard
     set -g __smart_env_in_progress 1
-    
+
     # Save old and new directory for checks
     set -l old_dir $__smart_env_prev_dir
     set -l new_dir $PWD
-    
+
     # Skip if the directory hasn't actually changed (sometimes PWD can be set to same value)
     if test "$old_dir" = "$new_dir"
         set -e __smart_env_in_progress
         return 0
     end
-    
+
     # Update the previous directory tracking
     set -g __smart_env_prev_dir $PWD
-    
+
     # If this is the first run, don't unset anything
     if test -z "$old_dir"
         # Just initialize things
@@ -52,17 +52,17 @@ function __smart_env_directory_watcher --on-variable PWD --description "Auto-loa
             end
         end
     end
-    
+
     # Check for .env files in the new directory
     set -l env_files
-    
+
     # Check for common env file patterns right in this directory
     for pattern in .env .env.local .env.development .env.local.development
         if test -f $pattern
             set -a env_files $pattern
         end
     end
-    
+
     # If we found any env files, load them
     if test (count $env_files) -gt 0
         set_color cyan
@@ -74,7 +74,7 @@ function __smart_env_directory_watcher --on-variable PWD --description "Auto-loa
 
     # Prepend ./bin to PATH if enabled and bin directory exists
     # This runs AFTER mise's hook to ensure ./bin is first
-    if set -q SMART_ENV_PREPEND_BIN; and test "$SMART_ENV_PREPEND_BIN" = "true"
+    if set -q SMART_ENV_PREPEND_BIN; and test "$SMART_ENV_PREPEND_BIN" = true
         if test -d "$PWD/bin"
             # Remove any existing ./bin or $PWD/bin from PATH first
             set -l new_path

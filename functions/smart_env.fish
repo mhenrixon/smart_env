@@ -60,7 +60,7 @@ function smart_env --description "Simple environment loader with change detectio
                             set load_file 1
                         case a approve A
                             set load_file 1
-                            echo $file_hash > $hash_file
+                            echo $file_hash >$hash_file
                             cp $abs_path $cache_file
                             set_color green
                             echo "✅ File approved for automatic loading"
@@ -87,7 +87,7 @@ function smart_env --description "Simple environment loader with change detectio
                         set load_file 1
                     case a approve A
                         set load_file 1
-                        echo $file_hash > $hash_file
+                        echo $file_hash >$hash_file
                         cp $abs_path $cache_file
                         set_color green
                         echo "✅ File approved for automatic loading"
@@ -106,7 +106,7 @@ function smart_env --description "Simple environment loader with change detectio
                 echo -n "" >$paths_file
 
                 # Store the current directory with this env file
-                echo $PWD > $dir_track_file
+                echo $PWD >$dir_track_file
 
                 # Track which variables we've set
                 set -l set_variables
@@ -165,14 +165,14 @@ function smart_env --description "Simple environment loader with change detectio
                         end
 
                         # Always track the variable so we can unset it
-                        echo $var_name >> $vars_file
+                        echo $var_name >>$vars_file
                     end
                 end
 
                 # Save tracked paths to file for later removal
                 if test (count $added_paths) -gt 0
                     for p in $added_paths
-                        echo $p >> $paths_file
+                        echo $p >>$paths_file
                     end
                 end
 

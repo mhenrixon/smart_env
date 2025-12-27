@@ -36,7 +36,7 @@ function smart_env_unset --description "Unset environment variables for the curr
                     # For each variable in vars_file, unset it
                     for var_name in (cat $vars_file)
                         # Skip PATH - we handle it separately via paths_file
-                        if test "$var_name" = "PATH"
+                        if test "$var_name" = PATH
                             continue
                         end
 
@@ -120,7 +120,7 @@ function smart_env_unset --description "Unset environment variables for the curr
                     # For each variable in vars_file, unset it
                     for var_name in (cat $vars_file)
                         # Handle PATH specially - don't touch it directly
-                        if test "$var_name" = "PATH"
+                        if test "$var_name" = PATH
                             continue
                         end
 
@@ -146,4 +146,3 @@ function smart_env_unset --description "Unset environment variables for the curr
         end
     end
 end
-

@@ -1,0 +1,104 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  lint:
+    name: Lint Fish Scripts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Fish Shell
+        run: |
+          sudo apt-add-repository ppa:fish-shell/release-3 -y
+          sudo apt-get update
+          sudo apt-get install -y fish
+
+      - name: Check Fish version
+        run: fish --version
+
+      - name: Syntax check all fish scripts
+        run: |
+          echo "Checking syntax of all .fish files..."
+          find . -name "*.fish" -type f | while read -r file; do
+            echo "Checking: $file"
+            fish -n "$file" || exit 1
+          done
+          echo "All files passed syntax check!"
+
+      - name: Check formatting with fish_indent
+        run: |
+          echo "Checking formatting of all .fish files..."
+          FAILED=0
+          find . -name "*.fish" -type f | while read -r file; do
+            if ! diff -q "$file" <(fish_indent < "$file") > /dev/null 2>&1; then
+              echo "Formatting issue in: $file"
+              echo "Run 'fish_indent -w $file' to fix"
+              diff "$file" <(fish_indent < "$file") || true
+              FAILED=1
+            fi
+          done
+          if [ "$FAILED" -eq 1 ]; then
+            echo ""
+            echo "Some files have formatting issues. Run './scripts/lint.fish --fix' to auto-fix."
+            exit 1
+          fi
+          echo "All files are properly formatted!"
+
+  test:
+    name: Run Tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Fish Shell (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-add-repository ppa:fish-shell/release-3 -y
+          sudo apt-get update
+          sudo apt-get install -y fish
+
+      - name: Install Fish Shell (macOS)
+        if: runner.os == 'macOS'
+        run: brew install fish
+
+      - name: Check Fish version
+        run: fish --version
+
+      - name: Install fish-spec
+        run: |
+          mkdir -p ~/.local/share/omf/pkg
+          git clone https://github.com/oh-my-fish/fish-spec.git ~/.local/share/omf/pkg/fish-spec
+
+      - name: Run tests
+        run: fish scripts/test.fish
+
+  shellcheck:
+    name: ShellCheck (informational)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install ShellCheck
+        run: sudo apt-get install -y shellcheck
+
+      - name: Run ShellCheck on fish files (informational)
+        run: |
+          echo "Note: ShellCheck is designed for bash/sh, not fish."
+          echo "This step is informational only and may produce false positives."
+          echo ""
+          # ShellCheck doesn't fully support fish, so we just note this
+          echo "For fish-specific linting, we use fish -n and fish_indent."

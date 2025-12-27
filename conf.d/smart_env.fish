@@ -63,7 +63,7 @@ function __run_smart_env_unset_on_startup --on-event fish_prompt
 
     # Prepend ./bin to PATH if enabled and bin directory exists
     # This runs AFTER mise's hook to ensure ./bin is first
-    if set -q SMART_ENV_PREPEND_BIN; and test "$SMART_ENV_PREPEND_BIN" = "true"
+    if set -q SMART_ENV_PREPEND_BIN; and test "$SMART_ENV_PREPEND_BIN" = true
         if test -d "$PWD/bin"
             # Remove any existing ./bin or $PWD/bin from PATH first
             set -l new_path

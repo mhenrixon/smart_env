@@ -22,9 +22,9 @@ function describe_bundler_cleanup
 
     function it_clears_bundler_environment_variables
         # Simulate inherited bundler environment
-        set -gx BUNDLE_GEMFILE "/old/project/Gemfile"
+        set -gx BUNDLE_GEMFILE /old/project/Gemfile
         set -gx BUNDLE_PATH "/old/project/.bundle"
-        set -gx RUBYOPT "-rbundler/setup"
+        set -gx RUBYOPT -rbundler/setup
 
         # Run cleanup
         __smart_env_bundler_cleanup
@@ -49,10 +49,10 @@ function describe_bundler_cleanup
 
     function it_clears_all_bundle_vars
         # Set all bundler variables
-        set -gx BUNDLE_GEMFILE "/test/Gemfile"
+        set -gx BUNDLE_GEMFILE /test/Gemfile
         set -gx BUNDLE_PATH "/test/.bundle"
         set -gx BUNDLE_BIN "/test/.bundle/bin"
-        set -gx RUBYLIB "/some/rubylib"
+        set -gx RUBYLIB /some/rubylib
 
         # Run cleanup
         __smart_env_bundler_cleanup
@@ -100,17 +100,17 @@ end
 
 function describe_path_helper
     function it_detects_path_contains
-        set -l test_path "/usr/bin" "/test/bin" "/usr/local/bin"
+        set -l test_path /usr/bin /test/bin /usr/local/bin
 
         # Test using contains directly
         set -l result 0
-        if contains "/test/bin" $test_path
+        if contains /test/bin $test_path
             set result 1
         end
         assert $result = 1
 
         set -l result2 0
-        if contains "/nonexistent/bin" $test_path
+        if contains /nonexistent/bin $test_path
             set result2 1
         end
         assert $result2 = 0

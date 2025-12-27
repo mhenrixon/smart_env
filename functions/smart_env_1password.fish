@@ -152,18 +152,18 @@ function smart_env_1password --description "Load environment variables from 1Pas
     set -l meta_file $storage_dir/1password/$source_id.meta
 
     # Store metadata
-    echo "source=1password" > $meta_file
-    echo "item=$item" >> $meta_file
+    echo "source=1password" >$meta_file
+    echo "item=$item" >>$meta_file
     if test -n "$vault"
-        echo "vault=$vault" >> $meta_file
+        echo "vault=$vault" >>$meta_file
     end
-    echo "loaded="(date -u +"%Y-%m-%dT%H:%M:%SZ") >> $meta_file
+    echo "loaded="(date -u +"%Y-%m-%dT%H:%M:%SZ") >>$meta_file
 
     # Track current directory
-    echo $PWD > $dir_track_file
+    echo $PWD >$dir_track_file
 
     # Clear existing vars file
-    echo -n "" > $vars_file
+    echo -n "" >$vars_file
 
     # Track loaded variables
     set -l loaded_vars
@@ -206,7 +206,7 @@ function smart_env_1password --description "Load environment variables from 1Pas
             set -a loaded_vars $field_label
 
             # Track the variable
-            echo $field_label >> $vars_file
+            echo $field_label >>$vars_file
 
             set_color green
             echo "  ✓ $field_label"
