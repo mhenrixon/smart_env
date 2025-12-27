@@ -77,9 +77,15 @@ jobs:
         run: fish --version
 
       - name: Install fish-spec
+        uses: actions/checkout@v4
+        with:
+          repository: oh-my-fish/fish-spec
+          path: fish-spec
+
+      - name: Setup fish-spec
         run: |
           mkdir -p ~/.local/share/omf/pkg
-          git clone https://github.com/oh-my-fish/fish-spec.git ~/.local/share/omf/pkg/fish-spec
+          mv fish-spec ~/.local/share/omf/pkg/fish-spec
 
       - name: Run tests
         run: fish scripts/test.fish
