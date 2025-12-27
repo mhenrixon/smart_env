@@ -4,6 +4,7 @@
 
 > Smart environment variable management for fish shell
 
+[![CI](https://github.com/mhenrixon/smart_env/actions/workflows/ci.yml/badge.svg)](https://github.com/mhenrixon/smart_env/actions/workflows/ci.yml)
 [![Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg?style=flat-square)](LICENSE)
 [![Fish Shell Version](https://img.shields.io/badge/fish-v3.0.0-007EC7.svg?style=flat-square)](https://fishshell.com)
 [![Oh My Fish Framework](https://img.shields.io/badge/Oh%20My%20Fish-Framework-007EC7.svg?style=flat-square)](https://www.github.com/oh-my-fish/oh-my-fish)
@@ -133,6 +134,89 @@ To use 1Password integration, you need:
     ```
 
 The secrets will be loaded into your environment just like .env files, with the same security and tracking features.
+
+## Ruby/chruby Integration
+
+smart_env integrates with [chruby](https://github.com/postmodern/chruby) to properly manage Ruby environments when switching directories. This is especially important for:
+
+- **iTerm2 split panes** (CMD+D, CMD+SHIFT+D) which inherit parent environment
+- **Switching between projects** with different Ruby versions
+- **Preventing gem conflicts** from stale GEM_HOME/GEM_PATH variables
+
+### Setup chruby Integration
+
+If you use chruby for Ruby version management, run the setup script to ensure proper integration:
+
+```fish
+fish ~/.config/omf/pkg/smart_env/scripts/setup_chruby.fish
+```
+
+This script will:
+1. Check if chruby is installed
+2. Update your `~/.config/fish/config.fish` to source all required chruby functions
+3. Remove any broken custom `chruby_use` functions
+
+### Manual Setup
+
+If you prefer manual setup, ensure your `~/.config/fish/config.fish` includes:
+
+```fish
+# Source all chruby functions (order matters!)
+source /opt/homebrew/opt/chruby-fish/share/fish/vendor_functions.d/chruby_reset.fish
+source /opt/homebrew/opt/chruby-fish/share/fish/vendor_functions.d/chruby_use.fish
+source /opt/homebrew/opt/chruby-fish/share/fish/vendor_functions.d/chruby.fish
+source /opt/homebrew/opt/chruby-fish/share/fish/vendor_conf.d/chruby_auto.fish
+
+# Set default Ruby version
+chruby ruby-3.4  # or your preferred version
+```
+
+> **Note:** On Linux, the path may be `/usr/local/share/fish/vendor_functions.d/` instead.
+
+### What This Fixes
+
+Without proper chruby integration, you may see errors like:
+
+```
+Ignoring bigdecimal-4.0.1 because its extensions are not built
+You must use Bundler 4 or greater with this lockfile
+```
+
+These occur when `GEM_HOME` and `GEM_PATH` from a previous project "leak" into new shell sessions.
+
+## Configuration
+
+### Enable ./bin PATH Prepending
+
+To automatically prepend `./bin` to your PATH when entering directories (useful for Rails binstubs):
+
+```fish
+set -gx SMART_ENV_PREPEND_BIN true
+```
+
+Add this to your `~/.config/fish/config.fish`.
+
+## Troubleshooting
+
+See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for common issues and solutions.
+
+## Development
+
+### Running Tests
+
+```fish
+./scripts/test.fish
+```
+
+### Linting
+
+```fish
+# Check for issues
+./scripts/lint.fish
+
+# Auto-fix formatting
+./scripts/lint.fish --fix
+```
 
 # License
 
